@@ -16,3 +16,14 @@ const DATABASE_URL = process.env.DATABASE_URL
 app.listen(PORT, () => {
     console.log(`Server listening on PORT ${PORT}`)
 })
+
+const mongoClient = new MongoClient(DATABASE_URL)
+let db
+
+try {
+    await mongoClient.connect()
+    db = mongoClient.db()
+    console.log("Data base is connected")
+} catch (error) {
+    console.log("Can't connect to data base")
+}
