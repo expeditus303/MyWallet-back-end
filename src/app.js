@@ -35,6 +35,35 @@ try {
     console.log("Can't connect to data base");
 }
 
+app.get("/registry", async (req, res) => {
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "");
+
+    if (!token) return res.sendStatus(401);
+
+    const registrySchema = joi.object({
+        token: joi.string().required(),
+    });
+
+    const validation = registrySchema.validate({token});
+
+    if (validation.error) return res.status(400).send(validation.error.message);
+
+    try {
+        const tokenExists = await db.collection(SESSIONS).findOne({ token });
+
+        if (!tokenExists) return res.sendStatus(401);
+
+        const userRegistry = await db.collection(REGISTRY).find({ userId: tokenExists.user_id }).toArray()
+
+        res.status(200).send(userRegistry)
+
+    } catch (error) {
+        res.send(error)
+    }
+
+})
+
 app.post("/sign-in", async (req, res) => {
     const { email } = req.body;
     const { password } = req.headers;
@@ -161,7 +190,7 @@ app.post("/new-transaction", async (req, res) => {
                 description: description,
                 value: Number(value),
                 type: type,
-                subtotal: (lastSubtotal.length > 0 ? (Number(lastSubtotal[0].subtotal) + Number(value)).toFixed(2) : 0 + Number(value).toFixed(2))
+                subtotal: Number(lastSubtotal.length > 0 ? (Number(lastSubtotal[0].subtotal) + Number(value)).toFixed(2) : 0 + Number(value).toFixed(2))
             };
         } else if (type === "expense") {
             newTransaction = {
@@ -170,7 +199,7 @@ app.post("/new-transaction", async (req, res) => {
                 description: description,
                 value: Number(value),
                 type: type,
-                subtotal: (lastSubtotal.length > 0 ? (Number(lastSubtotal[0].subtotal) - Number(value)).toFixed(2) : 0 - Number(value).toFixed(2))
+                subtotal: Number(lastSubtotal.length > 0 ? (Number(lastSubtotal[0].subtotal) - Number(value)).toFixed(2) : 0 - Number(value).toFixed(2))
             };
         }
 
