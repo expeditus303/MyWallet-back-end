@@ -143,27 +143,27 @@ app.post("/new-income", async (req, res) => {
 
   try {
     const tokenExists = await db.collection(SESSIONS).findOne({ token });
-    console.log(tokenExists)
 
     if (!tokenExists) return res.sendStatus(401);
 
     // const newUser = await db.collection(REGISTRY).findOne({ userID: tokenExists._id })
 
-    // const subtotal = db.collection(REGISTRY).find({userId: tokenExists.user_id}).sort({$natural:-1}).limit(1).toArray(arr)
+    const lastSubtotal = await db.collection(REGISTRY).find({userId: tokenExists.user_id}).sort({$natural:-1}).limit(1).toArray()
 
-    // function arr (err, docs) {
-    //     console.log(docs[0]);
-    // }
+    console.log(lastSubtotal)
 
     const today = dayjs().format("DD-MM");
-
+    
     const newIncome = {
       userId: tokenExists.user_id,
       date: today,
       description: description,
       value: Number(value),
-      type: "income", 
+      type: "income",
+      subtotal: (lastSubtotal.length > 0 ? Number(lastSubtotal[0].subtotal) + Number(value) : Number(value))
     };
+
+    // console.log(newIncome)
 
     await db.collection(REGISTRY).insertOne(newIncome);
     
@@ -171,5 +171,6 @@ app.post("/new-income", async (req, res) => {
     return res.sendStatus(200);
   } catch (error) {
     res.sendStatus(500);
+    console.log(error)
   }
 });
