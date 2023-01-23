@@ -219,9 +219,6 @@ app.post("/new-transaction", async (req, res) => {
       .find({ userId: tokenExists.user_id })
       .toArray();
 
-    console.log("aqui quejo");
-    console.log(userRegistry);
-
     const subtotal = {
       userId: tokenExists.user_id,
       subtotal: Number(newTransaction.value),
