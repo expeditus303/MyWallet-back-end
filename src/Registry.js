@@ -1,5 +1,7 @@
 import joi from "joi";
+import { REGISTRY, SESSIONS } from "./CONSTANTS.js";
 import db from "./database.js"
+
 
 export async function getRegistry(req, res) {
   const { authorization } = req.headers;
