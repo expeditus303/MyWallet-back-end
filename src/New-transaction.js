@@ -6,9 +6,11 @@ import { REGISTRY, SESSIONS, SUBTOTAL } from "./CONSTANTS.js";
 
 export default async function NewTransaction(req, res) {
 
-    const { description, value, type } = req.body;
+    let { description, value, type } = req.body;
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
+
+    value = Number(value)
   
     if (!token) return res.sendStatus(401);
   
@@ -28,6 +30,9 @@ export default async function NewTransaction(req, res) {
   
     if (validation.error) return res.status(400).send(validation.error.message);
   
+    console.log(value)
+    console.log(typeof(value))
+
     try {
       const tokenExists = await db.collection(SESSIONS).findOne({ token });
   
@@ -42,7 +47,7 @@ export default async function NewTransaction(req, res) {
           userId: tokenExists.user_id,
           date: today,
           description: description,
-          value: parseFloat(value).toFixed(2),
+          value: value,
           type: type,
   
           //BREAK
@@ -52,7 +57,7 @@ export default async function NewTransaction(req, res) {
           userId: tokenExists.user_id,
           date: today,
           description: description,
-          value: parseFloat(value * -1).toFixed(2),
+          value: (value * -1),
           type: type,
         };
       }
@@ -64,7 +69,7 @@ export default async function NewTransaction(req, res) {
   
       const subtotal = {
         userId: tokenExists.user_id,
-        subtotal: Number(newTransaction.value),
+        subtotal: Number((newTransaction.value)),
       };
   
       if (userRegistry.length === 0) {
