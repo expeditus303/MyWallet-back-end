@@ -1,23 +1,13 @@
-import db from "./database.js";
+import db from "../config/database.js";
 import dayjs from "dayjs";
 import { ObjectId } from "mongodb";
-import { REGISTRY, SESSIONS, SUBTOTAL } from "./CONSTANTS.js";
-import { deleteTransactionSchema, getTransactionSchema, newTransactionSchema } from "../model/TransactionsSchema.js";
+import { REGISTRY, SESSIONS, SUBTOTAL } from "../CONSTANTS.js";
 
 export async function GetTransactions(req, res) {
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
 
-  if (!token) return res.sendStatus(401);
-
-  const validation = getTransactionSchema.validate({ token });
-
-  if (validation.error) return res.status(400).send(validation.error.message);
-
+  const tokenExists = res.locals.session
+  
   try {
-    const tokenExists = await db.collection(SESSIONS).findOne({ token });
-
-    if (!tokenExists) return res.sendStatus(401);
 
     const userRegistry = await db
       .collection(REGISTRY)
@@ -41,29 +31,13 @@ export async function GetTransactions(req, res) {
 
 export async function NewTransaction(req, res) {
   let { description, value, type } = req.body;
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
+  
+  const tokenExists = res.locals.session
 
   value = Number(value);
 
-  if (!token) return res.sendStatus(401);
-
-  const validation = newTransactionSchema.validate({
-    description,
-    value,
-    type,
-    token,
-  });
-
-  if (validation.error) return res.status(400).send(validation.error.message);
-
-  console.log(value);
-  console.log(typeof value);
 
   try {
-    const tokenExists = await db.collection(SESSIONS).findOne({ token });
-
-    if (!tokenExists) return res.sendStatus(401);
 
     const today = dayjs().format("DD-MM");
 
@@ -127,17 +101,8 @@ export async function NewTransaction(req, res) {
 
 export async function DeleteTrasaction(req, res) {
   const { id } = req.params;
-  const { authorization } = req.headers;
-  const token = authorization?.replace("Bearer ", "");
 
-  if (!token) return res.sendStatus(401);
-
-  const validation = deleteTransactionSchema.validate({
-    id,
-    token,
-  });
-
-  if (validation.error) return res.status(400).send(validation.error.message);
+  const token =  res.locals.session.token
 
   try {
     const tokenExists = await db.collection(SESSIONS).findOne({ token });
