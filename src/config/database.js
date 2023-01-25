@@ -10,7 +10,7 @@ let db;
 
 try {
   await mongoClient.connect();
-  db = mongoClient.db();
+  db = mongoClient.db("MyWallet");
 
 } catch (error) {
   console.log("Can't connect to data base");
