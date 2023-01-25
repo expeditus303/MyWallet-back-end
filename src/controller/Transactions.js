@@ -94,8 +94,7 @@ export async function NewTransaction(req, res) {
 
     return res.sendStatus(200);
   } catch (error) {
-    res.sendStatus(500);
-    console.log(error);
+    res.status(500).send(error);
   }
 }
 
