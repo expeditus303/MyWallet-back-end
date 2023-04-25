@@ -12,6 +12,8 @@ transactionRouter.get("/registry", GetTransactions);
 
 transactionRouter.post("/new-transaction", transactionValidateSchema(newTransactionSchema), NewTransaction)
 
+// transactionRouter.put("/update/:id", UpdateTransaction);
+
 transactionRouter.delete("/delete/:id", DeleteTrasaction);
 
 export default transactionRouter

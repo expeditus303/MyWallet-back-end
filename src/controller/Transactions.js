@@ -142,3 +142,10 @@ export async function DeleteTrasaction(req, res) {
     console.log(error);
   }
 }
+
+// export async function UpdateTransaction(req, res) {
+//   const { id } = req.params;
+
+//   const token =  res.locals.session.token
+
+// }
