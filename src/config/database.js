@@ -11,9 +11,10 @@ let db;
 try {
   await mongoClient.connect();
   db = mongoClient.db("MyWallet");
+  console.log('Connected to database');
 
 } catch (error) {
-  console.log("Can't connect to data base");
+  console.log("Can't connect to database");
 }
 
 export default db
